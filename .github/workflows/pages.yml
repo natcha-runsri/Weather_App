@@ -1,0 +1,70 @@
+name: Deploy Flutter Web to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.29.3 # Dart 3.7.2 ตรงกับ environment.sdk ^3.7.2 ใน pubspec.yaml
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Create dart_defines.json from secrets
+        env:
+          NETPIE_CONTROL_TOKEN: ${{ secrets.NETPIE_CONTROL_TOKEN }}
+          NETPIE_STATUS_TOKEN: ${{ secrets.NETPIE_STATUS_TOKEN }}
+          NETPIE_MOBILE_SECRET: ${{ secrets.NETPIE_MOBILE_SECRET }}
+        run: |
+          set +x
+          umask 077
+          jq -n \
+            --arg control "$NETPIE_CONTROL_TOKEN" \
+            --arg status "$NETPIE_STATUS_TOKEN" \
+            --arg secret "$NETPIE_MOBILE_SECRET" \
+            '{NETPIE_CONTROL_TOKEN: $control, NETPIE_STATUS_TOKEN: $status, NETPIE_MOBILE_SECRET: $secret}' \
+            > dart_defines.json
+
+      - name: Build web
+        run: flutter build web --release --base-href "/Weather_App/" --dart-define-from-file=dart_defines.json
+
+      - name: Remove dart_defines.json
+        if: always()
+        run: rm -f dart_defines.json
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
