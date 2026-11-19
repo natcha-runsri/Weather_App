@@ -43,3 +43,13 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Secrets / local config (do not commit)
+.env*
+.firebase/
+*.pem
+*.p12
+key.properties
+*.jks
+*.keystore
+/dart_defines.json
