@@ -12,12 +12,12 @@ class WeatherService  {
       'https://iotproject-dbc8b-default-rtdb.asia-southeast1.firebasedatabase.app/';
 
   /// ===== Mobile App Device =====
-  static const String controlClientId = 'f5dac080-f4b4-4348-8324-216355396979';
+  static const String controlClientId = '11555b0d-d6a1-463e-a4b7-4ffcb23580e8';
   /// อ่านจาก --dart-define-from-file=dart_defines.json (ห้ามฝังค่าในโค้ด)
   static const String controlToken = String.fromEnvironment('NETPIE_CONTROL_TOKEN');
 
   /// ===== ESP32 Device =====
-  static const String statusClientId = '8c3c6eed-d17c-4125-b6e0-651c0a8c4e9a';
+  static const String statusClientId = '37942e2d-30bf-444a-9b21-addd2c43a295';
   static const String statusToken = String.fromEnvironment('NETPIE_STATUS_TOKEN');
 
   /// ชื่อค่าที่ยังไม่ได้ตั้ง (ว่าง = ตั้งครบแล้ว)

@@ -14,7 +14,7 @@ class _WeatherDashboardState extends State<WeatherDashboard> {
   final WeatherService _service = WeatherService();
   late MqttService _mqtt;
   /// NETPIE Mobile Credential
-  final String mobileClientId = 'f5dac080-f4b4-4348-8324-216355396979';
+  final String mobileClientId = '11555b0d-d6a1-463e-a4b7-4ffcb23580e8';
   /// อ่านจาก --dart-define-from-file=dart_defines.json (ใช้ token เดียวกับ controlToken)
   final String mobileToken = WeatherService.controlToken;
   final String mobileSecret = const String.fromEnvironment('NETPIE_MOBILE_SECRET');
