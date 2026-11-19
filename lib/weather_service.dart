@@ -13,21 +13,38 @@ class WeatherService  {
 
   /// ===== Mobile App Device =====
   static const String controlClientId = 'f5dac080-f4b4-4348-8324-216355396979';
-  static const String controlToken = 'CaLnZA4Gv6SZZbi6d9iCEaQ5ievk1NpM';
+  /// อ่านจาก --dart-define-from-file=dart_defines.json (ห้ามฝังค่าในโค้ด)
+  static const String controlToken = String.fromEnvironment('NETPIE_CONTROL_TOKEN');
 
   /// ===== ESP32 Device =====
   static const String statusClientId = '8c3c6eed-d17c-4125-b6e0-651c0a8c4e9a';
-  static const String statusToken = 'PkPqGZXszdXFXU7i23r8iE8fyrtcX1b3';
+  static const String statusToken = String.fromEnvironment('NETPIE_STATUS_TOKEN');
+
+  /// ชื่อค่าที่ยังไม่ได้ตั้ง (ว่าง = ตั้งครบแล้ว)
+  static List<String> get missingConfig => [
+        if (controlToken.isEmpty) 'NETPIE_CONTROL_TOKEN',
+        if (statusToken.isEmpty) 'NETPIE_STATUS_TOKEN',
+      ];
+
+  static String _require(String value, String name) {
+    if (value.isEmpty) {
+      throw StateError(
+          'ยังไม่ได้ตั้งค่า $name — รันด้วย --dart-define-from-file=dart_defines.json');
+    }
+    return value;
+  }
 
   /// ===== Headers =====
   Map<String, String> get _controlHeaders => {
         'Content-Type': 'application/json',
-        'Authorization': 'Device $controlClientId:$controlToken',
+        'Authorization':
+            'Device $controlClientId:${_require(controlToken, 'NETPIE_CONTROL_TOKEN')}',
       };
 
   Map<String, String> get _statusHeaders => {
         'Content-Type': 'application/json',
-        'Authorization': 'Device $statusClientId:$statusToken',
+        'Authorization':
+            'Device $statusClientId:${_require(statusToken, 'NETPIE_STATUS_TOKEN')}',
       };
 
   Future<Map<String, dynamic>> getWeatherData() async {

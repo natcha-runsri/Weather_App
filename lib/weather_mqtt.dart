@@ -15,8 +15,9 @@ class _WeatherDashboardState extends State<WeatherDashboard> {
   late MqttService _mqtt;
   /// NETPIE Mobile Credential
   final String mobileClientId = 'f5dac080-f4b4-4348-8324-216355396979';
-  final String mobileToken = 'CaLnZA4Gv6SZZbi6d9iCEaQ5ievk1NpM';
-  final String mobileSecret = 'CTkEDeVUmvmTRbesuP7FwDhGhazuxdsS';
+  /// อ่านจาก --dart-define-from-file=dart_defines.json (ใช้ token เดียวกับ controlToken)
+  final String mobileToken = WeatherService.controlToken;
+  final String mobileSecret = const String.fromEnvironment('NETPIE_MOBILE_SECRET');
 
   /// Device
   bool red = false;
@@ -50,7 +51,18 @@ class _WeatherDashboardState extends State<WeatherDashboard> {
       },
     );
 
-    _mqtt.connect();
+    if (mobileToken.isEmpty || mobileSecret.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          duration: Duration(days: 1),
+          content: Text(
+              'ยังไม่ได้ตั้งค่า NETPIE_CONTROL_TOKEN / NETPIE_MOBILE_SECRET — '
+              'รันด้วย --dart-define-from-file=dart_defines.json'),
+        ));
+      });
+    } else {
+      _mqtt.connect();
+    }
 
     /// load sensor
     loadWeather();
